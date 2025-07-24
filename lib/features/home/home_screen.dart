@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../services/user_service.dart';
+import '../info/info_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -9,11 +11,60 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _counter = 0;
+  Map<String, dynamic>? _userInfo;
+  bool _isLoadingUserInfo = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserInfo();
+  }
+
+  Future<void> _loadUserInfo() async {
+    final userInfo = await UserService.getUserInfo();
+    setState(() {
+      _userInfo = userInfo;
+      _isLoadingUserInfo = false;
+    });
+  }
 
   void _incrementCounter() {
     setState(() {
       _counter++;
     });
+  }
+
+  Future<void> _logout() async {
+    final success = await UserService.clearUserInfo();
+    if (success && mounted) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const InfoScreen()),
+      );
+    }
+  }
+
+  void _showLogoutDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Logout'),
+        content: const Text('Are you sure you want to logout? Your information will be deleted.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _logout();
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Logout'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -23,6 +74,55 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: const Text('Manga Creator'),
         elevation: 0,
+        actions: [
+          if (!_isLoadingUserInfo && _userInfo != null)
+            PopupMenuButton<String>(
+              onSelected: (value) {
+                if (value == 'profile') {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => const InfoScreen()),
+                  );
+                } else if (value == 'logout') {
+                  _showLogoutDialog();
+                }
+              },
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: 'profile',
+                  child: Row(
+                    children: [
+                      Icon(Icons.edit, color: Colors.grey[600]),
+                      const SizedBox(width: 8),
+                                             const Text('Edit Profile'),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'logout',
+                  child: Row(
+                    children: [
+                      Icon(Icons.logout, color: Colors.red[600]),
+                      const SizedBox(width: 8),
+                      Text('Logout', style: TextStyle(color: Colors.red[600])),
+                    ],
+                  ),
+                ),
+              ],
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: CircleAvatar(
+                  backgroundColor: const Color(0xFF4ECDC4),
+                  child: Text(
+                    _userInfo?['name']?.toString().substring(0, 1).toUpperCase() ?? 'U',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
       body: Container(
         decoration: const BoxDecoration(
@@ -60,18 +160,57 @@ class _HomeScreenState extends State<HomeScreen> {
                       color: Color(0xFFFF6B6B),
                     ),
                     const SizedBox(height: 20),
-                    const Text(
-                      'Chào mừng đến với\nManga Creator!',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF333333),
+                    if (_isLoadingUserInfo)
+                      const CircularProgressIndicator()
+                    else if (_userInfo != null) ...[
+                      Text(
+                        'Welcome, ${_userInfo!['name']}!',
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF333333),
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                      textAlign: TextAlign.center,
-                    ),
+                      const SizedBox(height: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF4ECDC4).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.email_outlined,
+                              size: 16,
+                              color: Colors.grey[600],
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              _userInfo!['email'] ?? '',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ] else
+                      const Text(
+                        'Welcome to\nManga Creator!',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF333333),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
                     const SizedBox(height: 20),
                     const Text(
-                      'Bắt đầu tạo ra những tác phẩm manga tuyệt vời!',
+                      'Start creating amazing manga artworks!',
                       style: TextStyle(
                         fontSize: 16,
                         color: Color(0xFF666666),
@@ -84,13 +223,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         // Navigate to create manga screen
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text('Tính năng sẽ được phát triển sớm!'),
+                            content: Text('Feature coming soon!'),
                             backgroundColor: Color(0xFF4ECDC4),
                           ),
                         );
                       },
                       icon: const Icon(Icons.add_circle),
-                      label: const Text('Tạo Manga Mới'),
+                      label: const Text('Create New Manga'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF4ECDC4),
                         foregroundColor: Colors.white,

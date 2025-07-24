@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../gen/assets.gen.dart';
-import '../home/home_screen.dart';
+import '../info/info_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -246,7 +246,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
               child: TextButton(
                 onPressed: () {
-                  _navigateToHome();
+                  _navigateToInfo();
                 },
                 child: const Text(
                   'Skip',
@@ -287,7 +287,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     curve: Curves.easeInOut,
                   );
                 } else {
-                  _navigateToHome();
+                  _navigateToInfo();
                 }
               },
               style: ElevatedButton.styleFrom(
@@ -326,10 +326,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  void _navigateToHome() {
+  void _navigateToInfo() {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
-        builder: (context) => const HomeScreen(),
+        builder: (context) => const InfoScreen(),
       ),
     );
   }
