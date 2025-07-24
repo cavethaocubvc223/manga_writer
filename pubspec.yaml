@@ -39,6 +39,7 @@ dependencies:
   flutter_secure_storage: ^9.2.4
   shared_preferences: ^2.5.3
   line_awesome_flutter: ^3.0.1
+  flutter_gen_runner: ^5.11.0
 
 dev_dependencies:
   flutter_test:
@@ -50,6 +51,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
+  build_runner: ^2.6.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -75,3 +77,12 @@ flutter_launcher_icons:
   min_sdk_android: 21
   remove_alpha_ios: true
   background_color_ios: "#ffffff"
+
+flutter_gen:
+  output: lib/gen/
+  line_length: 80
+  integrations:
+    image: true
+    flutter_svg: true
+    rive: true
+    lottie: true
