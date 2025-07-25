@@ -41,6 +41,7 @@ dependencies:
   line_awesome_flutter: ^3.0.1
   flutter_gen_runner: ^5.11.0
   flutter_vector_icons: ^2.0.0
+  signature: ^5.5.0
 
 dev_dependencies:
   flutter_test:

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import '../home/home_screen.dart';
+import '../main/main_screen.dart';
 import '../../services/user_service.dart';
 
 class InfoScreen extends StatefulWidget {
@@ -60,7 +60,7 @@ class _InfoScreenState extends State<InfoScreen> {
 
       if (success && mounted) {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
+          MaterialPageRoute(builder: (context) => const MainScreen()),
         );
       } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
