@@ -309,6 +309,10 @@ class _HomeScreenState extends State<HomeScreen> {
               
               // Character Management Section
               _buildCharacterSection(),
+              const SizedBox(height: 20),
+              
+              // Manga Creation Guide
+              _buildMangaGuideSection(),
             ],
           ),
         ),
@@ -1201,6 +1205,176 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildMangaGuideSection() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.95),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.school, color: Color(0xFFFFE66D)),
+              const SizedBox(width: 8),
+              const Text(
+                'How to Create Your Manga',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF333333),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          _buildGuideStep(
+            step: '1',
+            title: 'Create Characters',
+            description: 'Start by creating unique characters with detailed personalities, appearances, and backstories.',
+            icon: Icons.person_add,
+            color: const Color(0xFF6C5CE7),
+          ),
+          const SizedBox(height: 12),
+          _buildGuideStep(
+            step: '2',
+            title: 'Plan Your Story',
+            description: 'Go to Library and create a new manga. Add your characters and choose a theme color.',
+            icon: Icons.auto_stories,
+            color: const Color(0xFF4ECDC4),
+          ),
+          const SizedBox(height: 12),
+          _buildGuideStep(
+            step: '3',
+            title: 'Write Chapters',
+            description: 'Break your story into chapters. Each chapter should advance the plot and develop characters.',
+            icon: Icons.book_outlined,
+            color: const Color(0xFF667eea),
+          ),
+          const SizedBox(height: 12),
+          _buildGuideStep(
+            step: '4',
+            title: 'Track Progress',
+            description: 'Use the dashboard to monitor your daily writing progress and stay motivated!',
+            icon: Icons.trending_up,
+            color: const Color(0xFF44A08D),
+          ),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFFFF6B6B), Color(0xFFFFE66D)],
+              ),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.tips_and_updates, color: Colors.white),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Pro Tip!',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Set a daily goal (like 3 pages) and track your progress to stay consistent!',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.white.withOpacity(0.9),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGuideStep({
+    required String step,
+    required String title,
+    required String description,
+    required IconData icon,
+    required Color color,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+          ),
+          child: Center(
+            child: Text(
+              step,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(icon, color: color, size: 20),
+                  const SizedBox(width: 8),
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF333333),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Text(
+                description,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[700],
+                  height: 1.4,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

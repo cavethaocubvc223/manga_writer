@@ -133,84 +133,221 @@ class _ListScreenState extends State<ListScreen> {
       onRefresh: _refreshMangaList,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
-        child: SizedBox(
-          height: MediaQuery.of(context).size.height * 0.6,
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(40),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.9),
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 20,
-                        offset: const Offset(0, 10),
-                      ),
+        child: Container(
+          constraints: BoxConstraints(
+            minHeight: MediaQuery.of(context).size.height * 0.7,
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Animated illustration
+              Container(
+                width: 160,
+                height: 160,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Color(0xFF667eea),
+                      Color(0xFF764ba2),
                     ],
                   ),
-                  child: Column(
-                    children: [
-                      Icon(
-                        Icons.menu_book_outlined,
-                        size: 80,
-                        color: Colors.grey[400],
-                      ),
-                      const SizedBox(height: 20),
-                      Text(
-                        'No manga yet',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        'Start creating your first manga!',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey[500],
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      ElevatedButton.icon(
-                        onPressed: () async {
-                          final result = await Navigator.of(context).push<bool>(
-                            MaterialPageRoute(
-                              builder: (context) => const AddMangaScreen(),
-                            ),
-                          );
-                          
-                          if (result == true) {
-                            _refreshMangaList();
-                          }
-                        },
-                        icon: const Icon(Icons.add),
-                        label: const Text('Create First Manga'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF667eea),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 24,
-                            vertical: 12,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                  borderRadius: BorderRadius.circular(80),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF667eea).withOpacity(0.3),
+                      blurRadius: 30,
+                      offset: const Offset(0, 15),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+                child: const Icon(
+                  Icons.auto_stories,
+                  size: 80,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 32),
+              
+              // Main message
+              const Text(
+                'Ready to Create?',
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF333333),
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              
+              Text(
+                'Your manga library is empty.\nStart your creative journey today!',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey[600],
+                  height: 1.4,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 32),
+              
+              // Features showcase
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    _buildFeatureItem(
+                      icon: Icons.palette,
+                      title: 'Create Characters',
+                      description: 'Design unique characters with detailed profiles',
+                      color: const Color(0xFF4ECDC4),
+                    ),
+                    const SizedBox(height: 12),
+                    _buildFeatureItem(
+                      icon: Icons.edit_note,
+                      title: 'Write Stories',
+                      description: 'Craft compelling narratives chapter by chapter',
+                      color: const Color(0xFFFFE66D),
+                    ),
+                    const SizedBox(height: 12),
+                    _buildFeatureItem(
+                      icon: Icons.trending_up,
+                      title: 'Track Progress',
+                      description: 'Monitor your daily writing achievements',
+                      color: const Color(0xFFFF6B6B),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 32),
+              
+              // CTA Buttons
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () async {
+                        final result = await Navigator.of(context).push<bool>(
+                          MaterialPageRoute(
+                            builder: (context) => const AddMangaScreen(),
+                          ),
+                        );
+                        
+                        if (result == true) {
+                          _refreshMangaList();
+                        }
+                      },
+                      icon: const Icon(Icons.add_circle_outline),
+                      label: const Text('Create First Manga'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF667eea),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        elevation: 0,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              
+              TextButton.icon(
+                onPressed: () {
+                  // Navigate to tutorial/guide
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Row(
+                        children: [
+                          Icon(Icons.lightbulb, color: Colors.white),
+                          SizedBox(width: 8),
+                          Text('Check the Dashboard for creation guide!'),
+                        ],
+                      ),
+                      backgroundColor: Color(0xFF4ECDC4),
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(12)),
+                      ),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.help_outline),
+                label: const Text('How to get started?'),
+                style: TextButton.styleFrom(
+                  foregroundColor: const Color(0xFF667eea),
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildFeatureItem({
+    required IconData icon,
+    required String title,
+    required String description,
+    required Color color,
+  }) {
+    return Row(
+      children: [
+        Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(
+            icon,
+            color: color,
+            size: 20,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF333333),
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                description,
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -310,45 +447,17 @@ class _ListScreenState extends State<ListScreen> {
                   ),
                 ],
               ),
-              trailing: PopupMenuButton<String>(
-                onSelected: (value) {
-                  if (value == 'edit') {
-                    _showEditDialog(manga);
-                  } else if (value == 'delete') {
-                    _showDeleteDialog(manga);
-                  }
-                },
-                itemBuilder: (context) => [
-                  const PopupMenuItem(
-                    value: 'edit',
-                    child: Row(
-                      children: [
-                        Icon(Icons.edit, color: Colors.blue),
-                        SizedBox(width: 8),
-                        Text('Edit'),
-                      ],
-                    ),
-                  ),
-                  const PopupMenuItem(
-                    value: 'delete',
-                    child: Row(
-                      children: [
-                        Icon(Icons.delete, color: Colors.red),
-                        SizedBox(width: 8),
-                        Text('Delete'),
-                      ],
-                    ),
-                  ),
-                ],
-                child: Container(
+              trailing: IconButton(
+                onPressed: () => _showDeleteDialog(manga),
+                icon: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     color: Colors.grey[100],
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(
-                    Icons.more_vert,
-                    color: Colors.grey[600],
+                    Icons.delete_outline,
+                    color: Colors.red[400],
                   ),
                 ),
               ),
@@ -425,64 +534,9 @@ class _ListScreenState extends State<ListScreen> {
     );
   }
 
-  void _showEditDialog(Manga manga) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Edit feature coming soon!'),
-        backgroundColor: Color(0xFF4ECDC4),
-      ),
-    );
-  }
 
-  void _showMangaDetails(Manga manga) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(manga.title),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Description:',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.grey[700],
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(manga.description),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Container(
-                  width: 20,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    color: manga.color,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Text('${manga.pages} pages'),
-                const Spacer(),
-                Text(
-                  _formatDate(manga.createdAt),
-                  style: TextStyle(color: Colors.grey[600]),
-                ),
-              ],
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
-          ),
-        ],
-      ),
-    );
-  }
+
+
 
   void _showSearchDialog() {
     showDialog(

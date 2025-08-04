@@ -25,14 +25,14 @@ class CharacterService {
       final String? characterListJson = prefs.getString(_characterListKey);
       
       if (characterListJson == null) {
-        return _getDefaultCharacters();
+        return [];
       }
 
       final List<dynamic> characterListMap = jsonDecode(characterListJson);
       return characterListMap.map((map) => Character.fromMap(map)).toList();
     } catch (e) {
       print('Error loading characters: $e');
-      return _getDefaultCharacters();
+      return [];
     }
   }
 
@@ -253,49 +253,5 @@ class CharacterService {
     return List.from(_defaultColors);
   }
 
-  // Get default characters data
-  static List<Character> _getDefaultCharacters() {
-    final now = DateTime.now();
-    return [
-      Character(
-        id: '1',
-        name: 'Akira Tanaka',
-        description: 'Nhân vật chính với khả năng đặc biệt',
-        role: 'protagonist',
-        appearance: 'Tóc đen, mắt xanh, cao 170cm',
-        personality: 'Dũng cảm, tốt bụng, có chút bướng bỉnh',
-        backstory: 'Một học sinh bình thường cho đến khi khám phá ra sức mạnh ẩn giấu',
-        characterColor: const Color(0xFFFF6B6B),
-        createdAt: now.subtract(const Duration(days: 1)),
-        lastModified: now.subtract(const Duration(days: 1)),
-        mangaIds: ['1'],
-      ),
-      Character(
-        id: '2',
-        name: 'Yuki Sato',
-        description: 'Bạn thân của nhân vật chính',
-        role: 'supporting',
-        appearance: 'Tóc nâu, mắt nâu, thấp hơn Akira',
-        personality: 'Thông minh, tính cách điềm tĩnh, luôn hỗ trợ bạn bè',
-        backstory: 'Đến từ gia đình trí thức, am hiểu về ma thuật cổ',
-        characterColor: const Color(0xFF4ECDC4),
-        createdAt: now.subtract(const Duration(days: 2)),
-        lastModified: now.subtract(const Duration(days: 2)),
-        mangaIds: ['1'],
-      ),
-      Character(
-        id: '3',
-        name: 'Kage no Senshi',
-        description: 'Kẻ thù bí ẩn của nhân vật chính',
-        role: 'antagonist',
-        appearance: 'Luôn che mặt bằng mặt nạ đen',
-        personality: 'Lạnh lùng, tính toán, có mục đích riêng',
-        backstory: 'Quá khứ bí ẩn, có mối liên hệ với gia đình Akira',
-        characterColor: const Color(0xFF667eea),
-        createdAt: now.subtract(const Duration(days: 3)),
-        lastModified: now.subtract(const Duration(days: 3)),
-        mangaIds: ['1', '2'],
-      ),
-    ];
-  }
+
 }

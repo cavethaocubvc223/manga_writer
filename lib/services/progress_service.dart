@@ -20,14 +20,14 @@ class ProgressService {
       final String? progressListJson = prefs.getString(_progressListKey);
       
       if (progressListJson == null) {
-        return _getDefaultProgress();
+        return [];
       }
 
       final List<dynamic> progressListMap = jsonDecode(progressListJson);
       return progressListMap.map((map) => DailyProgress.fromMap(map)).toList();
     } catch (e) {
       print('Error loading progress: $e');
-      return _getDefaultProgress();
+      return [];
     }
   }
 
@@ -346,44 +346,5 @@ class ProgressService {
     }
   }
 
-  // Get default progress data (last 7 days with some sample data)
-  static List<DailyProgress> _getDefaultProgress() {
-    final List<DailyProgress> defaultProgress = [];
-    final now = DateTime.now();
-    
-    for (int i = 6; i >= 0; i--) {
-      final date = now.subtract(Duration(days: i));
-      final dayStart = DateTime(date.year, date.month, date.day);
-      
-      // Add some sample data for demonstration
-      int pages = 0;
-      int chapters = 0;
-      int characters = 0;
-      int time = 0;
-      
-      if (i < 3) { // Last 3 days have some activity
-        pages = (i + 1) * 2;
-        if (pages >= 5) chapters = 1;
-        if (i == 0) characters = 1; // Created a character today
-        time = pages * 15; // 15 minutes per page
-      }
-      
-      final progress = DailyProgress(
-        id: '${dayStart.millisecondsSinceEpoch}',
-        date: dayStart,
-        pagesWritten: pages,
-        chaptersCompleted: chapters,
-        charactersCreated: characters,
-        timeSpentMinutes: time,
-        notes: pages > 0 ? 'Tiến độ tốt!' : '',
-        goalProgress: (pages / defaultDailyGoal).clamp(0.0, 1.0),
-        createdAt: dayStart,
-        lastModified: dayStart,
-      );
-      
-      defaultProgress.add(progress);
-    }
-    
-    return defaultProgress;
-  }
+
 }

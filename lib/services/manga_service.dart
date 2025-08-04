@@ -23,15 +23,14 @@ class MangaService {
       final String? mangaListJson = prefs.getString(_mangaListKey);
       
       if (mangaListJson == null) {
-        // Return default manga if no data exists
-        return _getDefaultManga();
+        return [];
       }
 
       final List<dynamic> mangaListMap = jsonDecode(mangaListJson);
       return mangaListMap.map((map) => Manga.fromMap(map)).toList();
     } catch (e) {
       print('Error loading manga: $e');
-      return _getDefaultManga();
+      return [];
     }
   }
 
@@ -197,37 +196,5 @@ class MangaService {
     return List.from(_defaultColors);
   }
 
-  // Get default manga data
-  static List<Manga> _getDefaultManga() {
-    final now = DateTime.now();
-    return [
-      Manga(
-        id: '1',
-        title: 'My First Manga',
-        description: 'A story about adventures and friendship in a magical world',
-        createdAt: now.subtract(const Duration(days: 1)),
-        lastModified: now.subtract(const Duration(days: 1)),
-        color: const Color(0xFFFF6B6B),
-        pages: 12,
-      ),
-      Manga(
-        id: '2',
-        title: 'Hero Journey',
-        description: 'Epic tale of a young hero discovering their true power',
-        createdAt: now.subtract(const Duration(days: 3)),
-        lastModified: now.subtract(const Duration(days: 3)),
-        color: const Color(0xFF4ECDC4),
-        pages: 8,
-      ),
-      Manga(
-        id: '3',
-        title: 'Love Story',
-        description: 'Romantic manga series about finding love in unexpected places',
-        createdAt: now.subtract(const Duration(days: 7)),
-        lastModified: now.subtract(const Duration(days: 7)),
-        color: const Color(0xFF667eea),
-        pages: 15,
-      ),
-    ];
-  }
+
 } 
