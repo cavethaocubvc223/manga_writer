@@ -273,6 +273,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
               _showLogoutDialog();
             },
           ),
+          _buildDivider(),
+          _buildSettingsTile(
+            icon: Icons.delete_forever,
+            title: 'Delete Account & Data',
+            subtitle: 'Permanently delete your account and all data',
+            titleColor: Colors.red[700],
+            onTap: () {
+              _showDeleteAccountDialog();
+            },
+          ),
         ],
       ),
     );
@@ -877,6 +887,238 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  void _showDeleteAccountDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.red.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(
+                Icons.warning,
+                color: Colors.red,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Text(
+              'Delete Account',
+              style: TextStyle(color: Colors.red),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'This action cannot be undone!',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.red,
+                fontSize: 16,
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text('The following data will be permanently deleted:'),
+            const SizedBox(height: 12),
+            const Row(
+              children: [
+                Icon(Icons.close, color: Colors.red, size: 16),
+                SizedBox(width: 8),
+                Text('Your account information'),
+              ],
+            ),
+            const SizedBox(height: 4),
+            const Row(
+              children: [
+                Icon(Icons.close, color: Colors.red, size: 16),
+                SizedBox(width: 8),
+                Text('All manga stories and chapters'),
+              ],
+            ),
+            const SizedBox(height: 4),
+            const Row(
+              children: [
+                Icon(Icons.close, color: Colors.red, size: 16),
+                SizedBox(width: 8),
+                Text('All character profiles'),
+              ],
+            ),
+            const SizedBox(height: 4),
+            const Row(
+              children: [
+                Icon(Icons.close, color: Colors.red, size: 16),
+                SizedBox(width: 8),
+                Text('All progress data'),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.orange.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.orange.withOpacity(0.3)),
+              ),
+              child: const Row(
+                children: [
+                  Icon(Icons.info, color: Colors.orange, size: 20),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Make sure to backup your data before proceeding!',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.orange,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _showConfirmDeleteDialog();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Continue'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showConfirmDeleteDialog() {
+    String confirmationText = '';
+    
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text(
+            'Final Confirmation',
+            style: TextStyle(color: Colors.red),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Type "DELETE" to confirm:',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: 'Type DELETE here',
+                ),
+                onChanged: (value) {
+                  setDialogState(() {
+                    confirmationText = value;
+                  });
+                },
+              ),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.red.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Text(
+                  '⚠️ This action is irreversible. All your data will be lost forever.',
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: confirmationText.toUpperCase() == 'DELETE' ? () async {
+                Navigator.pop(context);
+                
+                // Show loading dialog
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (context) => const AlertDialog(
+                    content: Row(
+                      children: [
+                        CircularProgressIndicator(),
+                        SizedBox(width: 20),
+                        Text('Deleting account and data...'),
+                      ],
+                    ),
+                  ),
+                );
+                
+                // Simulate deletion process
+                await Future.delayed(const Duration(seconds: 2));
+                
+                // Clear all user data
+                final success = await UserService.clearUserInfo();
+                
+                if (success && mounted) {
+                  Navigator.of(context).pop(); // Close loading dialog
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (context) => const OnboardingScreen()),
+                    (route) => false,
+                  );
+                  
+                  // Show confirmation
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Row(
+                        children: [
+                          Icon(Icons.check_circle, color: Colors.white),
+                          SizedBox(width: 8),
+                          Text('Account and data deleted successfully'),
+                        ],
+                      ),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
+              } : null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: confirmationText.toUpperCase() == 'DELETE' ? Colors.red : Colors.grey,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Delete Forever'),
+            ),
+          ],
+        ),
       ),
     );
   }
