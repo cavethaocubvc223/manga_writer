@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../services/manga_service.dart';
+import '../../services/character_service.dart';
+import '../../models/character.dart';
 
 class AddMangaScreen extends StatefulWidget {
   const AddMangaScreen({super.key});
@@ -16,6 +18,8 @@ class _AddMangaScreenState extends State<AddMangaScreen>
   
   Color _selectedColor = const Color(0xFFFF6B6B);
   bool _isLoading = false;
+  List<Character> _availableCharacters = [];
+  List<String> _selectedCharacterIds = [];
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
@@ -45,6 +49,7 @@ class _AddMangaScreenState extends State<AddMangaScreen>
     ));
     
     _animationController.forward();
+    _loadCharacters();
   }
 
   @override
@@ -53,6 +58,17 @@ class _AddMangaScreenState extends State<AddMangaScreen>
     _descriptionController.dispose();
     _animationController.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadCharacters() async {
+    try {
+      final characters = await CharacterService.getAllCharacters();
+      setState(() {
+        _availableCharacters = characters;
+      });
+    } catch (e) {
+      print('Error loading characters: $e');
+    }
   }
 
   Future<void> _saveManga() async {
@@ -68,6 +84,16 @@ class _AddMangaScreenState extends State<AddMangaScreen>
         description: _descriptionController.text.trim(),
         color: _selectedColor,
       );
+
+      // Assign selected characters to the new manga
+      if (success && _selectedCharacterIds.isNotEmpty) {
+        final mangaList = await MangaService.getAllManga();
+        final newManga = mangaList.last; // Get the most recently added manga
+        
+        for (final characterId in _selectedCharacterIds) {
+          await CharacterService.addCharacterToManga(characterId, newManga.id);
+        }
+      }
 
       if (success && mounted) {
         // Show success message
@@ -386,6 +412,20 @@ class _AddMangaScreenState extends State<AddMangaScreen>
                         const SizedBox(height: 12),
                         _buildColorSelector(),
                         
+                        const SizedBox(height: 24),
+                        
+                        // Character Selection
+                        const Text(
+                          'Add Characters',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF333333),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        _buildCharacterSelector(),
+                        
                         const SizedBox(height: 32),
                         
                         // Save Button
@@ -503,6 +543,158 @@ class _AddMangaScreenState extends State<AddMangaScreen>
           ),
         );
       }).toList(),
+    );
+  }
+
+  Widget _buildCharacterSelector() {
+    if (_availableCharacters.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.grey[50],
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey[300]!),
+        ),
+        child: Column(
+          children: [
+            Icon(Icons.person_outline, size: 32, color: Colors.grey[400]),
+            const SizedBox(height: 8),
+            Text(
+              'No characters available',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[600],
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Create characters in the dashboard first',
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey[500],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey[200]!),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Select characters for this manga:',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey[700],
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: _availableCharacters.map((character) {
+              final isSelected = _selectedCharacterIds.contains(character.id);
+              return GestureDetector(
+                onTap: () {
+                  setState(() {
+                    if (isSelected) {
+                      _selectedCharacterIds.remove(character.id);
+                    } else {
+                      _selectedCharacterIds.add(character.id);
+                    }
+                  });
+                },
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: isSelected ? _selectedColor.withOpacity(0.1) : Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: isSelected ? _selectedColor : Colors.grey[300]!,
+                      width: isSelected ? 2 : 1,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CircleAvatar(
+                        radius: 12,
+                        backgroundColor: character.characterColor,
+                        child: Text(
+                          character.initials,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        character.name,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: isSelected ? _selectedColor : Colors.grey[700],
+                        ),
+                      ),
+                      if (isSelected) ...[
+                        const SizedBox(width: 4),
+                        Icon(
+                          Icons.check_circle,
+                          size: 16,
+                          color: _selectedColor,
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+          if (_selectedCharacterIds.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: _selectedColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.info_outline,
+                    size: 16,
+                    color: _selectedColor,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      '${_selectedCharacterIds.length} character(s) selected',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: _selectedColor,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
     );
   }
 } 
